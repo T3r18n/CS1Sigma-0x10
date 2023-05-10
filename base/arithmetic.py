@@ -1,24 +1,24 @@
-// Sigma16: arithmetic.mjs
-// Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
-// See Sigma16/README, LICENSE, and https://jtod.github.io/home/Sigma16
+# Sigma16: arithmetic.mjs
+# Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
+# See Sigma16/README, LICENSE, and https:#jtod.github.io/home/Sigma16
 
-// This file is part of Sigma16.  Sigma16 is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-// Sigma16 is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// General Public License for more details.  You should have received
-// a copy of the GNU General Public License along with Sigma16.  If
-// not, see <https://www.gnu.org/licenses/>.
+# This file is part of Sigma16.  Sigma16 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+# Sigma16 is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.  You should have received
+# a copy of the GNU General Public License along with Sigma16.  If
+# not, see <https:#www.gnu.org/licenses/>.
 
-//------------------------------------------------------------------------
-// arithmetic.mjs defines arithmetic for the architecture using
-// JavaScript arithmetic.  This includes word representation, data
-// conversions, and bit manipulation, operations on fields, and
-// arithmetic as required by the instruction set architecture.
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# arithmetic.mjs defines arithmetic for the architecture using
+# JavaScript arithmetic.  This includes word representation, data
+# conversions, and bit manipulation, operations on fields, and
+# arithmetic as required by the instruction set architecture.
+#------------------------------------------------------------------------
 
 import * as com from './common.mjs';
 import * as smod from './s16module.mjs';
@@ -27,25 +27,25 @@ import * as arch from './architecture.mjs';
 export const word16mask = 0x0000ffff
 export const word32mask = 0xffffffff
 
-//------------------------------------------------------------------------
-// Ensuring and asserting validity of words
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Ensuring and asserting validity of words
+#------------------------------------------------------------------------
 
-// All operations that produce a word should produce a valid word,
-// which is represented as a nonnegative integer.  For a k-bit word,
-// the value x must satisfy 0 <= x < 2^k.  The assert functions check
-// a value and output an error message to the console if it is not
-// valid.
+# All operations that produce a word should produce a valid word,
+# which is represented as a nonnegative integer.  For a k-bit word,
+# the value x must satisfy 0 <= x < 2^k.  The assert functions check
+# a value and output an error message to the console if it is not
+# valid.
 
-// Addresses are limited to either 16 bits for S16 or 32 bits for S32.
-// If an address exceeds this range it wraps around.  This is
-// implemented by anding its value with addressMask.
+# Addresses are limited to either 16 bits for S16 or 32 bits for S32.
+# If an address exceeds this range it wraps around.  This is
+# implemented by anding its value with addressMask.
 
 export function limit16 (x) { return x & word16mask }
-// export function limit32 (x) { return x & word32mask }
-export function limit32 (x) { return x } // ????? temp
+# export function limit32 (x) { return x & word32mask }
+export function limit32 (x) { return x } # ????? temp
 
-// See also em.limitAddress
+# See also em.limitAddress
 
 export function assert16 (x) {
     if (0 <= x && x < 2^16) {
@@ -65,20 +65,20 @@ export function assert32 (x) {
     }
 }
 
-// Only integers representable exactly in 53 bits are representable
-// exactly, so assert64 doesn't really do anything.  Consider bigint.
+# Only integers representable exactly in 53 bits are representable
+# exactly, so assert64 doesn't really do anything.  Consider bigint.
 
 export function assert64 (x) {
         return x
 }
 
-// Determine whether a JavaScript number is a valid Sigma16 word
-// (which is represented using binary).  If not, print an error
-// message and treat the number as 0.
+# Determine whether a JavaScript number is a valid Sigma16 word
+# (which is represented using binary).  If not, print an error
+# message and treat the number as 0.
 
-// deprecated, use assert16 instead ?????
+# deprecated, use assert16 instead ?????
 function validateWord (x) {
-    return x // ??? consider limit16 or limit32
+    return x # ??? consider limit16 or limit32
     const y = x & 0x0000ffff
     if (x!==y) {
         console.log (`Internal error: ${x} is not a valid word`)
@@ -87,9 +87,9 @@ function validateWord (x) {
 }
 
 /* old version
-// Determine whether a JavaScript number is a valid Sigma16 word
-// (which is represented using binary).  If not, print an error
-// message and treat the number as 0.
+# Determine whether a JavaScript number is a valid Sigma16 word
+# (which is represented using binary).  If not, print an error
+# message and treat the number as 0.
 function validateWord (x) {
     if (x < minBin || x > maxBin) {
 	com.mode.devlog (`validateWord: ${x} is not a valid word (out of range)`);
@@ -99,7 +99,7 @@ function validateWord (x) {
     }
 }
 */
-// Restrict word to the 16 bit integer part; no error if there are extra 1 bits
+# Restrict word to the 16 bit integer part; no error if there are extra 1 bits
 
 export function truncateWord (x) {
     const r = (x < 0) ? 0 : (x & 0xffff);
@@ -107,12 +107,12 @@ export function truncateWord (x) {
     return r;
 }
 
-// Determine whether a JavaScript number is a valid Sigma16 integer
-// (which is represented using two's complement).  If not, print an
-// error message and treat the number as 0.
+# Determine whether a JavaScript number is a valid Sigma16 integer
+# (which is represented using two's complement).  If not, print an
+# error message and treat the number as 0.
 
 function validateInt (x) {
-    //    if (x < minTC || x > maxTC) {
+    #    if (x < minTC || x > maxTC) {
     if (x < minTC || x > maxBin) {
 	com.mode.devlog (`validateInt: ${x} is not a valid int (out of range)`);
 	return 0;
@@ -122,11 +122,11 @@ function validateInt (x) {
 }
 
 
-//------------------------------------------------------------------------
-// Logic
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Logic
+#------------------------------------------------------------------------
 
-// Mnemonics for logic
+# Mnemonics for logic
 
 /*
   x  y   f x y
@@ -142,8 +142,8 @@ or  = 0111 =  7
 xor = 0110 =  6
 */
 
-// Given the mnemonic for a logic function, return the truth table
-// encoding needed for the general logic box circuit
+# Given the mnemonic for a logic function, return the truth table
+# encoding needed for the general logic box circuit
 
 export function logicFunction(mnemonic) {
     return mnemonic=="andnew" ? 1
@@ -157,7 +157,7 @@ export function logicFunction(mnemonic) {
         : 0
 }
 
-// fcn is an encoded truth table, x and y are bit operands
+# fcn is an encoded truth table, x and y are bit operands
 
 export function applyLogicFcnBit (fcn, x, y) {
     let result = x==0
@@ -193,25 +193,25 @@ function applyLogicFcnHelper (p,q,r,s, x, y) {
 }
 
 
-//------------------------------------------------------------------------
-// Words, binary numbers, and two's complement integers
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Words, binary numbers, and two's complement integers
+#------------------------------------------------------------------------
 
-// Sigma16 uses 16-bit words.  A word is represented as a JavaScript
-// integer whose value is the binary interpretation of the word.  Thus
-// a word w must satisfy 0 <= w < 2^16.
+# Sigma16 uses 16-bit words.  A word is represented as a JavaScript
+# integer whose value is the binary interpretation of the word.  Thus
+# a word w must satisfy 0 <= w < 2^16.
 
-const const8000  = 32768;    // 2^15
-const constffff  = 65535     // 2^16 - 1
-const const10000 = 65536;    // 2^16
+const const8000  = 32768;    # 2^15
+const constffff  = 65535     # 2^16 - 1
+const const10000 = 65536;    # 2^16
 
-// A JavaScript variable has a large range, but a JavaScript variable
-// used to represent a Sigma16 binary word or two's complement integer
-// must be an integer (no fractional part like 3.5) and within a
-// restricted range.
+# A JavaScript variable has a large range, but a JavaScript variable
+# used to represent a Sigma16 binary word or two's complement integer
+# must be an integer (no fractional part like 3.5) and within a
+# restricted range.
 
-// Binary number          0 <= x < 2^16          0, 1, ...,          65535
-// Two's complemen t  -2^15 <= x < 2^15 - 1    -32768, ...,  0, ..., 32767
+# Binary number          0 <= x < 2^16          0, 1, ...,          65535
+# Two's complemen t  -2^15 <= x < 2^15 - 1    -32768, ...,  0, ..., 32767
 
 const minBin = 0;
 const maxBin = 65535;
@@ -229,38 +229,38 @@ export function wordToBool (x) {
     return ! (x === 0);
 }
 
-// return bit i from word w, result is number (0 or 1)
-//function extractBit (w,i) {
-//    let foo = 1 << i;
-//    let bar = foo & w;
-//    com.mode.devlog (`foo = ${foo}`);
-//    return bar===0 ? 0 : 1;
-//}
+# return bit i from word w, result is number (0 or 1)
+#function extractBit (w,i) {
+#    let foo = 1 << i;
+#    let bar = foo & w;
+#    com.mode.devlog (`foo = ${foo}`);
+#    return bar===0 ? 0 : 1;
+#}
 
 
-//------------------------------------------------------------------------
-// Converting between binary words and two's complement integers
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Converting between binary words and two's complement integers
+#------------------------------------------------------------------------
 
-// Natural numbers are represented in binary.  The binary value of a
-// word w is just s (i.e. the value of the JavaScript int).
+# Natural numbers are represented in binary.  The binary value of a
+# word w is just s (i.e. the value of the JavaScript int).
 
-// Integers are represented in two's complement.  The two's complement
-// value of a word w is returned by wordToInt (w)
+# Integers are represented in two's complement.  The two's complement
+# value of a word w is returned by wordToInt (w)
 
-// Invariants
-//   intToWord (wordToInt (x)) = x
-//   wordToInt (intToWord (x)) = x
+# Invariants
+#   intToWord (wordToInt (x)) = x
+#   wordToInt (intToWord (x)) = x
 
 export function wordToInt (w) {
     let x = assert16 (w);
     return x < const8000 ? x : x - const10000;
 }
 
-// An Int is represented using two's complement.  return [w, ovfl]
-// where w is a word representing the two's complement int, and ovfl
-// is a boolean.  If ovfl is true then x is not representable in a 16
-// bit word
+# An Int is represented using two's complement.  return [w, ovfl]
+# where w is a word representing the two's complement int, and ovfl
+# is a boolean.  If ovfl is true then x is not representable in a 16
+# bit word
 
 export function intToWord (x) {
     const y = validateInt (x);
@@ -269,7 +269,7 @@ export function intToWord (x) {
     return result;
 }
 
-// Show a word in hex, binary, and two's complement
+# Show a word in hex, binary, and two's complement
 
 function showWord (w) {
     return 0 <= w && w <= maxBin
@@ -277,11 +277,11 @@ function showWord (w) {
         : `word ${w} is invalid: out of range`;
 }
 
-//------------------------------------------------------------------------
-//  Operating on fields of a word
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+#  Operating on fields of a word
+#------------------------------------------------------------------------
 
-// Return the 4-bit fields of a word
+# Return the 4-bit fields of a word
 
 export function splitWord (x) {
     let y = assert16 (x);
@@ -296,21 +296,21 @@ export function splitWord (x) {
 }
 
 
-//------------------------------------------------------------------------
-// Hexadecimal notation
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Hexadecimal notation
+#------------------------------------------------------------------------
 
-// The assembly language allows hex numbers to be written with either
-// lower case a-f or upper case A-F.  When it outputs hex numbers, the
-// system always uses the lower case form.  There are conversion
-// functions between hex strings (which must be four characters
-// limited to valid hex digits) and words.
+# The assembly language allows hex numbers to be written with either
+# lower case a-f or upper case A-F.  When it outputs hex numbers, the
+# system always uses the lower case form.  There are conversion
+# functions between hex strings (which must be four characters
+# limited to valid hex digits) and words.
 
-// Invariants.  For valid x and str:
-//   hex4ToWord (wordToHex4 (x)) = x       e.g. hex4ToWord (wordToHex4 (52309))
-//   wordToHex4 (hex4ToWord (str)) = str   e.g. wordToHex4 (hex4ToWord ("5c7e"))
+# Invariants.  For valid x and str:
+#   hex4ToWord (wordToHex4 (x)) = x       e.g. hex4ToWord (wordToHex4 (52309))
+#   wordToHex4 (hex4ToWord (str)) = str   e.g. wordToHex4 (hex4ToWord ("5c7e"))
 
-// Character code constants for useful hex characters
+# Character code constants for useful hex characters
 const charCode0 = '0'.charCodeAt(0);
 const charCode9 = '9'.charCodeAt(0);
 const charCodea = 'a'.charCodeAt(0);
@@ -320,7 +320,7 @@ const charCodeF = 'F'.charCodeAt(0);
 const hexDigit =
       ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
 
-// Return a string giving the hex representation of a word
+# Return a string giving the hex representation of a word
 
 export function wordToHex4 (x) {
     let [p,q,r,s] = splitWord (limit16 (x))
@@ -328,7 +328,7 @@ export function wordToHex4 (x) {
 }
 
 export function wordToHex8 (x) { 
-    // a,b,c,d, e,f,g,h
+    # a,b,c,d, e,f,g,h
     let y = limit32 (x);
     let h = y & 0x000f;
     y = y >>> 4;
@@ -354,15 +354,15 @@ function showBit (b) {
     return b==0 ? '0' : 1
 }
 
-// Convert a string with four hex digits to a word.  If the string
-// isn't a valid hex number, thhe result is NaN.  To be valid, the
-// string must contain exactly four characters, each a valid hex
-// digit.  There is no prefix syntax: 3a8b is ok but not $3a8b or
-// 0x3a8b.  The assembly language uses a $ to indicate that a number
-// is hex, but the $ is not part of the hex number.
+# Convert a string with four hex digits to a word.  If the string
+# isn't a valid hex number, thhe result is NaN.  To be valid, the
+# string must contain exactly four characters, each a valid hex
+# digit.  There is no prefix syntax: 3a8b is ok but not $3a8b or
+# 0x3a8b.  The assembly language uses a $ to indicate that a number
+# is hex, but the $ is not part of the hex number.
 
 export function hex4ToWord (h) {
-//    com.mode.devlog("hex4ToWord " + h.length);
+#    com.mode.devlog("hex4ToWord " + h.length);
     if (h.length != 4) return NaN;
     return (4096 * hexCharToInt(h[0])
   	    +  256  * hexCharToInt(h[1])
@@ -370,8 +370,8 @@ export function hex4ToWord (h) {
        	    +         hexCharToInt(h[3]));
 }
 
-// Convert a hex character to an integer, or NaN if it isn't a valid
-// hex character.  The valid hex characters are 0-9, a-f, and A-F.
+# Convert a hex character to an integer, or NaN if it isn't a valid
+# hex character.  The valid hex characters are 0-9, a-f, and A-F.
 
 function hexCharToInt (cx) {
     let c = cx.charCodeAt(0);
@@ -382,40 +382,40 @@ function hexCharToInt (cx) {
 	   : (charCodeA <= c && c <= charCodeF
 	      ? 10 + c - charCodeA
 	      : NaN));
-//    com.mode.devlog("hexCharToInt " + cx + " c=" + c + " y=" + y)
+#    com.mode.devlog("hexCharToInt " + cx + " c=" + c + " y=" + y)
     return y;
 }
 
-//------------------------------------------------------------------------
-// Bitwise logic on words
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Bitwise logic on words
+#------------------------------------------------------------------------
 
-// Invert each bit in a word
+# Invert each bit in a word
 
 function wordInvert (x) {
     return x ^ 0x0000ffff
 }
 
 
-//------------------------------------------------------------------------
-// Testing arithmetic operations
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Testing arithmetic operations
+#------------------------------------------------------------------------
 
-// Example: test_rrdc ("op_add", op_add, 49, -7)
+# Example: test_rrdc ("op_add", op_add, 49, -7)
 
-// The operation generators (e.g. rrdc) are defined in emulator.js.
-// This function tests an operation such as op_add.
+# The operation generators (e.g. rrdc) are defined in emulator.js.
+# This function tests an operation such as op_add.
 
-// opn = string describing the operation, e.g. "op_add"
-// f = operations, e.g. op_add
-// x = first operand, typically ra
-// y = second operand, typically rb
+# opn = string describing the operation, e.g. "op_add"
+# f = operations, e.g. op_add
+# x = first operand, typically ra
+# y = second operand, typically rb
 
-// opn = name of op (e.g. "add")
-// op  = operation (e.g. add)
-// a = reg[ir_sa]
-// b = reg[ir_sb]
-// expect = string giving expected result
+# opn = name of op (e.g. "add")
+# op  = operation (e.g. add)
+# a = reg[ir_sa]
+# b = reg[ir_sb]
+# expect = string giving expected result
 
 function test_op (g,opn,op,c,a,b,expect) {
     com.mode.devlog (`test_op ${opn} ${c} ${a} ${b}`);
@@ -437,17 +437,17 @@ const g_rr  = (op,c,a,b) => op (a,b);
 const g_crr = (op,c,a,b) => op (c,a,b);
 
 
-//------------------------------------------------------------------------
-// Basic addition and subtraction
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Basic addition and subtraction
+#------------------------------------------------------------------------
 
-// Add two binary numbers.  If there is a carry out, that is
-// discarded: instead of overflow, the result wraps around.  For
-// example, binAdd (65535, 7) returns 6.  This is used to calculate
-// effective addresses and to increment the pc register.
+# Add two binary numbers.  If there is a carry out, that is
+# discarded: instead of overflow, the result wraps around.  For
+# example, binAdd (65535, 7) returns 6.  This is used to calculate
+# effective addresses and to increment the pc register.
 
 
-// Replace binadd with incrAddress, which uses different mask for 16/32 bit
+# Replace binadd with incrAddress, which uses different mask for 16/32 bit
 export function binAdd (x, y) {
     let r = validateWord (x) + validateWord (y);
     return r & 0x0000ffff;
@@ -459,12 +459,12 @@ export function incrAddress (es, x, i) {
     return r
 }
 
-//------------------------------------------------------------------------
-// Operations for the instructions
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# Operations for the instructions
+#------------------------------------------------------------------------
 
-// Shift a by k bits.  k>0 means shift left, k<0 means shift right.
-// Thhis calculates a * 2^k where a is a natural number (binary).
+# Shift a by k bits.  k>0 means shift left, k<0 means shift right.
+# Thhis calculates a * 2^k where a is a natural number (binary).
 
 export function op_shift (a,k) {
     const i = wordToInt (k);
@@ -473,8 +473,8 @@ export function op_shift (a,k) {
     return [primary, secondary];
 }
 
-// The primitive shifting functions are shiftL and shiftR.  These are
-// used by the instructions shiftl and shiftr, as well as shift.
+# The primitive shifting functions are shiftL and shiftR.  These are
+# used by the instructions shiftl and shiftr, as well as shift.
 
 export function shiftL (x,k) {
     return truncateWord (x << k);
@@ -484,9 +484,9 @@ export function shiftR (x,k) {
     return truncateWord (x >>> k);
 }
 
-// Set the condition code after performing addition-like arithmetic:
-// add, addc, sub.  This is calculated by examining the most
-// significant bit of the result, and the carry output.
+# Set the condition code after performing addition-like arithmetic:
+# add, addc, sub.  This is calculated by examining the most
+# significant bit of the result, and the carry output.
 
 export function additionCC (a,b,primary,sum) {
     const msba = arch.getBitInWordLE (a, 15)
@@ -509,7 +509,7 @@ export function additionCC (a,b,primary,sum) {
           | (tcNeg ? arch.ccl : 0)
           | (tcPos ? arch.ccg : 0)
     return secondary
-    //     if (tcOverflow) { setBitInRegBE (req,overflowBit) } ??????????????? req
+    #     if (tcOverflow) { setBitInRegBE (req,overflowBit) } ??????????????? req
 /*
     console.log (`additionCC sum = ${wordToHex4(sum)}`)
     console.log (`  addCC msb = ${msb} carryOut = ${carryOut}`)
@@ -518,17 +518,17 @@ export function additionCC (a,b,primary,sum) {
 */
 }
 
-// Arithmetic for the add instruction (rrdc).  There is no carry input
-// bit, so the condition code is not needed as an argument.  The
-// primary result is the two's complement sum, and the secondary
-// result is a condition code containing the carry out and indications
-// of binary overflow and integer overflow.
+# Arithmetic for the add instruction (rrdc).  There is no carry input
+# bit, so the condition code is not needed as an argument.  The
+# primary result is the two's complement sum, and the secondary
+# result is a condition code containing the carry out and indications
+# of binary overflow and integer overflow.
 
 export function op_add (a,b) {
     const sum = a + b
     const primary = sum & 0x0000ffff
     const secondary = additionCC (a,b,primary,sum)
-// com.mode.devlog (`*** op_add a=${wordToHex4(a)} b=${wordToHex4(b)} p=${wordToHex4(primary)} s=${wordToHex4(secondary)}`)
+# com.mode.devlog (`*** op_add a=${wordToHex4(a)} b=${wordToHex4(b)} p=${wordToHex4(primary)} s=${wordToHex4(secondary)}`)
     return [primary, secondary]
 }
 
@@ -558,11 +558,11 @@ export function op_mul (a,b) {
     let primary = p & 0x0000ffff;
     let tcOverflow = ! (minTC <= p && p <= maxTC)
     let secondary = (tcOverflow ? arch.ccv : 0);
-//    if (tcOverflow) { setBitInRegBE (req,overflowBit) } req ???????????????
+#    if (tcOverflow) { setBitInRegBE (req,overflowBit) } req ???????????????
     return [primary, secondary];
 }
 
-// Multiply Ra * Rb and place 32-bit result into R15++Rd.
+# Multiply Ra * Rb and place 32-bit result into R15++Rd.
 
 export function op_muln (c,a,b) {
     const k16 = 2**16
@@ -599,9 +599,9 @@ function test_mul () {
 export function op_div (a,b) {
     let aint = wordToInt (a);
     let bint = wordToInt (b);
-    let primary = intToWord (Math.floor (aint / bint));  // Knuth quotient
-    let secondary = intToWord (a - b * Math.floor(a/b)); // Knuth mod
-//    if (bint==0) { setBitInRegBE (req,zDivBit) }; req ??????????????????
+    let primary = intToWord (Math.floor (aint / bint));  # Knuth quotient
+    let secondary = intToWord (a - b * Math.floor(a/b)); # Knuth mod
+#    if (bint==0) { setBitInRegBE (req,zDivBit) }; req ??????????????????
     return [primary, secondary];
 }
 
@@ -671,23 +671,23 @@ export function op_xor (a,b) {
     return primary;
 }
 
-// These constants provide a faster way to set or clear the flags
+# These constants provide a faster way to set or clear the flags
 
-// calculateExtract is used for both the extract and extracti instructions
+# calculateExtract is used for both the extract and extracti instructions
 
 export function calculateExtract (wsize, wmask, dest, src, desti, srci, fsize) {
-// dmask contains 1 bits in the destination field
-// dclear is dest with 0s in destination field    
+# dmask contains 1 bits in the destination field
+# dclear is dest with 0s in destination field    
     const dmask = fieldMask (wsize, wmask, desti, fsize)
     const dmaski = (~dmask) & wmask
     const dclear = dest & dmaski
-// smask contains 1 bits in the source field    
-// sclear is src with 0s in source field
+# smask contains 1 bits in the source field    
+# sclear is src with 0s in source field
     const smask = fieldMask (wsize, wmask, srci, fsize)
     const sclear = src & smask
-// p is src field shifted to righthand position
+# p is src field shifted to righthand position
     const p = sclear >>> (srci - fsize + 1)
-// q is src field shifted to destination position
+# q is src field shifted to destination position
     const q = p << (desti - fsize + 1)
     const r = dclear | q
     console.log (`calculateExtract wsize=${wsize} wmask=${wordToHex4(wmask)}`
@@ -706,13 +706,13 @@ export function calculateExtract (wsize, wmask, dest, src, desti, srci, fsize) {
     return r
 }
 
-// p = source field (surrounded by 0) shifted to destination position
-    // destination mask has 1 bits where field will be inserted
+# p = source field (surrounded by 0) shifted to destination position
+    # destination mask has 1 bits where field will be inserted
 
 function fieldMask (wsize, wmask, i, fsize) {
-// shift right to the right number of 1s  at the right of the word
+# shift right to the right number of 1s  at the right of the word
     const p = wmask >>> (wsize - fsize)
-// shift left to put field of 1s at specified poosition
+# shift left to put field of 1s at specified poosition
     const q = p << (i- fsize + 1)
     console.log (`fieldMask `
                  + ` wsize = ${wsize}`
@@ -723,14 +723,14 @@ function fieldMask (wsize, wmask, i, fsize) {
                  + ` q = ${wordToHex4(q)}`)
     return q
 }
-// window.fm = fieldMask
-// window.ce = calculateExtract
+# window.fm = fieldMask
+# window.ce = calculateExtract
 
 export function calculateExtracti (wsize, fsize, x, xi, y, yi) {
-    // p = source field (surrounded by 0) shifted to destination position
+    # p = source field (surrounded by 0) shifted to destination position
     const xx = (~x) & 0xff;
     const p = (((xx << xi) & 0xffff) >>> (wsize-fsize)) << (wsize-yi-fsize);
-    // destination mask has 1 bits where field will be inserted
+    # destination mask has 1 bits where field will be inserted
     const dmask = (0xffff >>> (wsize-fsize)) << (wsize-yi-fsize);
     const dmaski = (~dmask) & 0xffff;
     const z = (y & dmaski) | p;
@@ -751,7 +751,7 @@ export function testCalculateExport () {
     calculateExtract (16,4, 0xffff, 8, 0, 8);
     calculateExtract (16,4, 0xffff, 8, 0, 10);
     calculateExtract (16,4, 0xffff, 8, 0, 12);
-    calculateExtract (16, 5, 0xffff, 3, 7, 9); // 007c = 0000 0000 0111 11000
+    calculateExtract (16, 5, 0xffff, 3, 7, 9); # 007c = 0000 0000 0111 11000
 }
 
 function test_add () {

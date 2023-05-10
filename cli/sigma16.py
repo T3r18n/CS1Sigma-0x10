@@ -1,23 +1,23 @@
-// Sigma16.mjs
-// Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
-// See Sigma16/README, LICENSE, and https://jtod.github.io/home/Sigma16
+# Sigma16.mjs
+# Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
+# See Sigma16/README, LICENSE, and https:#jtod.github.io/home/Sigma16
 
-// This file is part of Sigma16.  Sigma16 is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-// Sigma16 is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// General Public License for more details.  You should have received
-// a copy of the GNU General Public License along with Sigma16.  If
-// not, see <https://www.gnu.org/licenses/>.
+# This file is part of Sigma16.  Sigma16 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+# Sigma16 is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.  You should have received
+# a copy of the GNU General Public License along with Sigma16.  If
+# not, see <https:#www.gnu.org/licenses/>.
 
-//----------------------------------------------------------------------
-// Usage
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Usage
+#----------------------------------------------------------------------
 
-// Sigma16.mjs defines command line tools using node.js
+# Sigma16.mjs defines command line tools using node.js
 
 /*
 Usage: node Sigma16.mjs <command> <argument> ... <argument>
@@ -34,7 +34,7 @@ It's convenient to define "sigma16" as an alias for "node
 /path/to/Sigma16.mjs" (see Installation below)
 
   sigma16                 same as "sigma16 gui"
-  sigma16 gui             launch gui, visit http://localhost:3000/
+  sigma16 gui             launch gui, visit http:#localhost:3000/
   sigma16 run x           launch gui using version in path x
   sigma16 assemble x      read x.asm.txt, write .obj.txt, .lst.txt, .md.txt
   sigma16 link x m1 m2... read m1.obj.txt ..., write x.obj.txt
@@ -49,18 +49,18 @@ It's convenient to define "sigma16" as an alias for "node
   Writes linker listing to <exe>.lst.txt
 */
 
-//----------------------------------------------------------------------
-// Installation
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Installation
+#----------------------------------------------------------------------
 
 /*
-1. Software requirements: install npm, see https://nodejs.org/en/download/
+1. Software requirements: install npm, see https:#nodejs.org/en/download/
 2. Install dependencies: npm install (this will install express)
-3. Download the source directory from https://jtod.github.io/home/Sigma16/
+3. Download the source directory from https:#jtod.github.io/home/Sigma16/
    put it anywhere in your file space:   /path/to/SigmaSystem/Sigma16
 4. Add the following to your .profile or .bashrc:
 
-# Sigma system: https://jtod.github.io/home/Sigma16/
+# Sigma system: https:#jtod.github.io/home/Sigma16/
 export SIGMASYSTEM="/path/to/SigmaSystem"
 export SIGMA16=${SIGMASYSTEM}/Sigma16
 alias sigma16="node ${SIGMA16}/src/Sigma16/cli/Sigma16.mjs"
@@ -68,25 +68,25 @@ alias sigma16="node ${SIGMA16}/src/Sigma16/cli/Sigma16.mjs"
 */
 
 
-//----------------------------------------------------------------------
-// Initialization
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Initialization
+#----------------------------------------------------------------------
 
-// Standard packages
-// import express from 'express';
+# Standard packages
+# import express from 'express';
 import path from 'path';
 import * as fs from "fs";
 import { fileURLToPath } from 'url';
 
-// Components of Sigma16
-// import * as cn from "../gui/config.mjs";
-import * as st from "../base//state.mjs";
-import * as smod from "../base//s16module.mjs";
-import * as asm  from "../base//assembler.mjs";
-import * as link from "../base//linker.mjs";
+# Components of Sigma16
+# import * as cn from "../gui/config.mjs";
+import * as st from "../base#state.mjs";
+import * as smod from "../base#s16module.mjs";
+import * as asm  from "../base#assembler.mjs";
+import * as link from "../base#linker.mjs";
 import * as serv from '../server/sigserver.mjs'
 
-// Find paths to components of the software, relative to this file
+# Find paths to components of the software, relative to this file
 const cliDir = path.dirname (fileURLToPath (import.meta.url));
 const homeDir = path.join (cliDir, "/../../")
 const guiDir = path.join (homeDir, "/src/gui/")
@@ -96,13 +96,13 @@ const datafilesDir = path.join (homeDir, "/src/datafiles/");
 const docsDir = path.join (homeDir, "/docs/")
 const examplesDir = path.join (homeDir, "/examples");
 
-// Obtain command line arguments
-//   process.argv[0] = path to node.exe
-//   process.argv[1] = path to this file
-let command = process.argv[2]; // command to execute; if undefined use gui
-let commandArg = process.argv[3];  // argument to the command, if any
+# Obtain command line arguments
+#   process.argv[0] = path to node.exe
+#   process.argv[1] = path to this file
+let command = process.argv[2]; # command to execute; if undefined use gui
+let commandArg = process.argv[3];  # argument to the command, if any
 
-// Display all the parameters and file paths
+# Display all the parameters and file paths
 function showParameters () {
     console.log (`Sigma16: command=${command} arg=${commandArg}`);
     console.log (`homeDir =\n${homeDir}`);
@@ -114,11 +114,11 @@ function showParameters () {
     console.log (`examplesDir =\n${examplesDir}`);
 }
 
-//----------------------------------------------------------------------
-// Main program: dispatch on command
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Main program: dispatch on command
+#----------------------------------------------------------------------
 
-// Decide what operation is being requested, and do it
+# Decide what operation is being requested, and do it
 function main  () {
     if (process.argv.length < 3 || command === "gui") {
         console.log ("calling StartServer")
@@ -144,18 +144,18 @@ function main  () {
     }
 }
 
-//----------------------------------------------------------------------
-// Assembler
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Assembler
+#----------------------------------------------------------------------
 
-// Usage: node Sigma16.mjs assemble Foo
-//   Reads source from Foo.asm.txt
-//   Writes object code to Foo.obj.txt
-//   Writes metadata to Foo.md.txt
-//   Writes listing to Foo.lst.txt
+# Usage: node Sigma16.mjs assemble Foo
+#   Reads source from Foo.asm.txt
+#   Writes object code to Foo.obj.txt
+#   Writes metadata to Foo.md.txt
+#   Writes listing to Foo.lst.txt
 
 function assembleCLI () {
-    const baseName = process.argv[3]; // first command argument
+    const baseName = process.argv[3]; # first command argument
     const srcFileName = `${baseName}`
     const srcText = readFile (srcFileName)
     const ai = asm.assembler (baseName, srcText)
@@ -174,33 +174,33 @@ function assembleCLI () {
     }
 }
 
-//----------------------------------------------------------------------
-// Command line interface to linker
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Command line interface to linker
+#----------------------------------------------------------------------
 
-// Usage: node sigma16.mjs link <exe> <mod1> <mod2> ...
-//   Reads object from <mod1>.obj.txt, ...     (required)
-//   Reads metadata from <mod1>.md.txt, ...    (ok if they don't exist)
-//   Writes executable to <exe>.obj.txt
-//   Writes metadata to <exe>.md.txt
-//   Writes linker listing to <exe>.lst.txt
+# Usage: node sigma16.mjs link <exe> <mod1> <mod2> ...
+#   Reads object from <mod1>.obj.txt, ...     (required)
+#   Reads metadata from <mod1>.md.txt, ...    (ok if they don't exist)
+#   Writes executable to <exe>.obj.txt
+#   Writes metadata to <exe>.md.txt
+#   Writes linker listing to <exe>.lst.txt
 
-// Command line interface to the Linker.  Read the object code from
-// the specified files, create an S16Module for each, and populate
-// with the object code and the metadata (if it exists).  Create an
-// S16Module for the executable, call the linker, and write the
-// executable file and linker listing.
+# Command line interface to the Linker.  Read the object code from
+# the specified files, create an S16Module for each, and populate
+# with the object code and the metadata (if it exists).  Create an
+# S16Module for the executable, call the linker, and write the
+# executable file and linker listing.
 
 function linkCLI () {
-    const exeBaseName = process.argv[3]; // first command argument
-    const objBaseNames = process.argv.slice(4); // subsequent command arguments
+    const exeBaseName = process.argv[3]; # first command argument
+    const objBaseNames = process.argv.slice(4); # subsequent command arguments
     const exeMod = st.env.mkSelectModule (exeBaseName);
-    let objMods = []; // containers for object modules to be linked
+    let objMods = []; # containers for object modules to be linked
     for (const baseName of objBaseNames) {
         const objText = readFile (`${baseName}.obj.txt`);
         const objMd = readFile (`${baseName}.md.txt`);
         const mod = new st.S16Module (baseName);
-        const objInfo= new link.ObjectInfo (mod); // object code info
+        const objInfo= new link.ObjectInfo (mod); # object code info
         mod.objInfo = objInfo;
         objInfo.omText = objText;
         objInfo.omMd = objMd;
@@ -211,13 +211,13 @@ function linkCLI () {
     writeFile (`${exeBaseName}.lnk.txt`, lnkTxt);
 }
 
-//----------------------------------------------------------------------
-// File I/O via file names (runs in node but not in browser)
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# File I/O via file names (runs in node but not in browser)
+#----------------------------------------------------------------------
 
-// Attempt to read file fname.  If file can't be read, give error
-// message and return empty string; otherwise return the contents of
-// the file.
+# Attempt to read file fname.  If file can't be read, give error
+# message and return empty string; otherwise return the contents of
+# the file.
 
 export function readFile (fname) {
     let input, ok;
@@ -248,9 +248,9 @@ export function writeFile (fname, txt) {
     return ok;
 }
 
-//----------------------------------------------------------------------
-// Testing
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Testing
+#----------------------------------------------------------------------
 
 function runtest () {
     console.log ("runtest");
@@ -267,7 +267,7 @@ function runtest () {
 
     console.log (x.toText());
     console.log (x.getSrcPlain(4));
-    console.log (x.getSrcPlain(5));  // not defined
+    console.log (x.getSrcPlain(5));  # not defined
     console.log (x.getSrcDec(7));
     console.log (x.toText());
     console.log (x.getSrcPlain(3));
@@ -319,9 +319,9 @@ function runtest () {
     console.log ("runtest finished");
 }
 
-//----------------------------------------------------------------------
-// Run the main program
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Run the main program
+#----------------------------------------------------------------------
 
 console.log ("Starting main")
 main ();

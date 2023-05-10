@@ -149,11 +149,13 @@
 from express import HTTTPMixer as express
 from http import *
 from sys import *
-import os as process
-import * as path from 'path'
-import * as cors from 'cors'
-import * as ejs from 'ejs'
-import * as fs from "fs";
+import os as process,os.path as path
+from datetime import *
+import datetime as dtlib
+import time as Timelib
+import json as JSON, json.decoder as JSONDec,json.encoder as JSONEnc
+#import * as ejs from 'ejs'
+#import * as fs from "fs";
 
 #-----------------------------------------------------------------------
 # Configuration
@@ -178,19 +180,19 @@ import * as fs from "fs";
 #   heroku config                    -- show configuration variables
 
 # Read and save the environment variables for versions
-S16_LATEST_RELEASE = process.environ.S16_LATEST_RELEASE
-S16_RELEASE_VERSION = process.environ.S16_RELEASE_VERSION
-S16_DEV_VERSION = process.environ.S16_DEV_VERSION
+S16_LATEST_RELEASE = process.environ.get("S16_LATEST_RELEASE",None)
+S16_RELEASE_VERSION = process.environ.get("S16_RELEASE_VERSION",None)
+S16_DEV_VERSION = process.environ.get("S16_DEV_VERSION",None)
 
 # Environment variables: Server configuration
-S16_LOCAL_PORT = process.environ.S16_LOCAL_PORT
-S16_RUN_ENV = process.environ.S16_RUN_ENV
-SIGMASYSTEM = process.environ.SIGMASYSTEM
+S16_LOCAL_PORT = process.environ.get("S16_LOCAL_PORT",None)
+S16_RUN_ENV = process.environ.get("S16_RUN_ENV",None)
+SIGMASYSTEM = process.environ.get("SIGMASYSTEM",None)
 S16_SERVER_DIR = path.dirname (__file__)
 
 SIGSERVER_REPOSITORY = f"{SIGMASYSTEM}/server"
-stdout.write (f"SIGMASYSTEM = {SIGMASYSTEM}")
-stdout.write (f"SIGSERVER_REPOSITORY = {SIGSERVER_REPOSITORY}")
+print(f"SIGMASYSTEM = {SIGMASYSTEM}")
+print(f"SIGSERVER_REPOSITORY = {SIGSERVER_REPOSITORY}")
 
 S16_LOCAL_BUILD_DIR = None  # set by StartServer if running locally
 
@@ -208,7 +210,7 @@ S16_BUILD_DIR = None
 # defined in an environment variable, and can be changed to avoid
 # clash with any other application.
 
-PORT = process.environ.S16_LOCAL_PORT if(process.environ.S16_LOCAL_PORT) else ( S16_LOCAL_PORT if S16_LOCAL_PORT else 8080)
+PORT = process.environ.get("S16_LOCAL_PORT", S16_LOCAL_PORT if S16_LOCAL_PORT != None else 8080)
 
 #-----------------------------------------------------------------------
 # Server
@@ -224,25 +226,26 @@ express.static.mime.define({'text/html': ['html']});
 # Top index
 #-----------------------------------------------------------------------
 
-app.get ('/', (req,res) => {
-    stdout.write (f"responding-/")
+@app.get('ll')
+def index_(req,res):
+    print (f"responding-/")
     res.sendFile (path.join ('/app', 'topindex.html'))
-})
 
-app.get ('/index.html', (req,res) => {
-    stdout.write (f"responding-/-index.html")
+@app.get ('/index.html')
+def index_(req,res):
+    print (f"responding-/-index.html")
     res.sendFile (path.join ('/app', 'topindex.html'))
-})
 
-app.get ('/default.html', (req,res) => {
-    stdout.write (f"responding-/-default.html")
+
+@app.get ('/default.html')
+def index_(req,res):
+    print (f"responding-/-default.html")
     res.sendFile (path.join ('/app', 'topindex.html'))
-})
 
-app.get ('/docstyle.css', (req,res) => {
-    stdout.write (`responding-/`)
+@app.get ('/docstyle.css')
+def index_(req,res):
+    print (f"responding-/")
     res.sendFile (path.join ('/app', 'docstyle.css'))
-})
 
 #-----------------------------------------------------------------------
 # Provide latest version on request
@@ -260,45 +263,45 @@ app.get ('/docstyle.css', (req,res) => {
 # Older versions use this form; keep for backward compatibility
 
 def initver(req,res):
-    reqInfo = {"date": new Date (), "ip": req.ip, "path": req.path, "callerversion": req.params.callerversion}
-    xs = JSON.stringify (reqInfo)
-    stdout.write (f"responding-status-latest ${xs}")
+    reqInfo = {"date": Timelib.strftime("%d:%m:%Y",Timelib.time()), "ip": req.ip, "path": req.path, "callerversion": req.params.callerversion}
+    xs = JSON.dumps (reqInfo)
+    print(f"responding-status-latest ${xs}")
     res.type('text/plain')
     res.set('Access-Control-Allow-Origin', '*')
     reply = S16_LATEST_RELEASE
     res.send (reply)
 
-app.get ('/status/latest/:callerversion', (req,res) => {
-    const reqInfo = {
-        date: new Date (),
-        ip: req.ip,
-        path: req.path,
-        callerversion: req.params.callerversion
+@app.get ('/status/latest/:callerversion')
+def index_(req,res):
+    reqInfo = {
+        "date": Timelib.strftime("%d:%m:%Y",Timelib.time()),
+        "ip": req.ip,
+        "path": req.path,
+        "callerversion": req.params.callerversion
     }
-    const xs = JSON.stringify (reqInfo)
-    stdout.write (`responding-status-latest ${xs}`)
+    xs = JSON.dumps (reqInfo)
+    print(f"responding-status-latest {xs}")
     res.type ('text/plain')
     res.set ('Access-Control-Allow-Origin', '*')
-    const reply = S16_LATEST_RELEASE
+    reply = S16_LATEST_RELEASE
     res.send (reply)
-})
 
 # Starting URL with /sigma16 allows for status request for future
 # programs
-app.get ('/sigma16/status/latest/:callerversion', (req,res) => {
-    const reqInfo = {
-        date: new Date (),
-        ip: req.ip,
-        path: req.path,
-        callerversion: req.params.callerversion
+@app.get ('/sigma16/status/latest/:callerversion')
+def index_(req,res):
+    reqInfo = {
+        "date": Timelib.strftime("%d:%m:%Y",Timelib.time()),
+        "ip": req.ip,
+        "path": req.path,
+        "callerversion": req.params.callerversion
     }
-    const xs = JSON.stringify (reqInfo)
-    stdout.write (`responding-sigma16-status-latest ${xs}`)
+    xs = JSON.stringify (reqInfo)
+    print(f"responding-sigma16-status-latest {xs}")
     res.type ('text/plain')
     res.set ('Access-Control-Allow-Origin', '*')
-    const reply = S16_LATEST_RELEASE
+    reply = S16_LATEST_RELEASE
     res.send (reply)
-})
 
 #-----------------------------------------------------------------------
 # Request to launch Sigma16
@@ -310,84 +313,68 @@ app.get ('/sigma16/status/latest/:callerversion', (req,res) => {
 # dev).  A symbolically named version is substituted with the
 # corresponding version number which is used to find the files.
 
-function substituteVersion (v) {
-    return v === 'release' ? S16_RELEASE_VERSION
-        : v === 'test' ? S16_DEV_VERSION
-        : v === 'dev' ? 'dev'
-        : v
-}
+def substituteVersion (v):
+    return S16_RELEASE_VERSION if v == 'release' else ( S16_DEV_VERSION if v == 'test' else ( 'dev' if(v == 'dev') else(v)))
 
 # Provide response headers and send the file
 
-function finish (req, res, loc) {
+def finish (req, res, loc):
     res.set ('Cross-Origin-Embedder-Policy', 'require-corp')
     res.set ('Cross-Origin-Opener-Policy', 'same-origin')
-#    stdout.write (loc)
+#    print (loc)
     res.sendFile (loc)
-}
 
 # start page
 
-app.get('/sigma16/build/:version/Sigma16/Sigma16.html', (req, res) => {
-    const raw_v = req.params.version
-    const v = substituteVersion (raw_v)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16', 'Sigma16.html')
-    stdout.write (`launching ${raw_v}->${v} at location ${loc}`)
+@app.get('/sigma16/build/:version/Sigma16/Sigma16.html')
+def index_(req, res):
+    raw_v = req.params.version
+    v = substituteVersion (raw_v)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', 'Sigma16.html')
+    print(f"launching {raw_v}->{v} at location {loc}")
     finish (req, res, loc)
-})
 
 # emwt
 
-app.get('/sigma16/build/:version/Sigma16/emwt.mjs', (req, res) => {
-    const raw_v = req.params.version
-    const v = substituteVersion (raw_v)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16',
-                           'src', 'base', 'emwt.mjs')
-    stdout.write (`reading emwt ${raw_v}->${v} at location ${loc}`)
+@app.get('/sigma16/build/:version/Sigma16/emwt.mjs')
+def index_(req, res):
+    raw_v = req.params.version
+    v = substituteVersion (raw_v)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', 'src', 'base', 'emwt.mjs')
+    print (f"reading emwt {raw_v}->{v} at location {loc}")
     finish (req, res, loc)
-})
 
 # emulator core
 
-app.get('/sigma16/build/:version/Sigma16/emcore.wasm', (req, res) => {
-    stdout.write ('responding-emcore.wasm')
-    const raw_v = req.params.version
-    const v = substituteVersion (raw_v)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16',
-                           'src', 'base', 'emcore.wasm')
-    stdout.write (`responding-emcore ${raw_v}->${v} at location ${loc}`)
+@app.get('/sigma16/build/:version/Sigma16/emcore.wasm')
+def index_(req, res):
+    print('responding-emcore.wasm')
+    raw_v = req.params.version
+    v = substituteVersion (raw_v)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', 'src', 'base', 'emcore.wasm')
+    print(f"responding-emcore {raw_v}->{v} at location {loc}")
     res.set ('Access-Control-Allow-Origin', '*')
     finish (req, res, loc)
-})
 
 # generic file paths
 
-app.get('/sigma16/build/:version/Sigma16/:a/:b/:c/*', (req, res) => {
-    const v = substituteVersion (req.params.version)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16',
-                           req.params.a,
-                           req.params.b,
-                           req.params.c,
-                           path.basename (req.path))
+@app.get('/sigma16/build/:version/Sigma16/:a/:b/:c/*')
+def index_(req, res):
+    v = substituteVersion (req.params.version)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', req.params.a, req.params.b, req.params.c, path.basename (req.path))
     finish (req, res, loc)
-})
 
-app.get('/sigma16/build/:version/Sigma16/:a/:b/*', (req, res) => {
-    const v = substituteVersion (req.params.version)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16',
-                           req.params.a,
-                           req.params.b,
-                           path.basename (req.path))
+@app.get('/sigma16/build/:version/Sigma16/:a/:b/*')
+def index_(req, res):
+    v = substituteVersion (req.params.version)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', req.params.a, req.params.b, path.basename (req.path))
     finish (req, res, loc)
-})
 
-app.get('/sigma16/build/:version/Sigma16/:a/*', (req, res) => {
-    const v = substituteVersion (req.params.version)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16',
-                           req.params.a,
-                           path.basename (req.path))
+@app.get('/sigma16/build/:version/Sigma16/:a/*')
+def index_(req, res):
+    v = substituteVersion (req.params.version)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', req.params.a, path.basename (req.path))
     finish (req, res, loc)
-})
 
 # There are no mjs files in the Sigma16 directory.  However, the base
 # emulator files are loaded by emwt when the processor is entered,
@@ -395,12 +382,11 @@ app.get('/sigma16/build/:version/Sigma16/:a/*', (req, res) => {
 # Sigma16/src/base).  They are provided by this rule, which must come
 # after the rules that match src/gui/* and src/base/*
 
-app.get('/sigma16/build/:version/Sigma16/*.mjs', (req, res) => {
-    const v = substituteVersion (req.params.version)
-    const loc = path.join (S16_BUILD_DIR, v, 'Sigma16',
-                           'src', 'base', path.basename (req.path))
+@app.get('/sigma16/build/:version/Sigma16/*.mjs')
+def index_(req, res):
+    v = substituteVersion (req.params.version)
+    loc = path.join (S16_BUILD_DIR, v, 'Sigma16', 'src', 'base', path.basename (req.path))
     finish (req, res, loc)
-})
 
 #-----------------------------------------------------------------------
 # Cross origin isolation
@@ -435,13 +421,14 @@ app.get('/sigma16/build/:version/Sigma16/*.mjs', (req, res) => {
 # URL path: world.html
 #-----------------------------------------------------------------------
 
-app.get ('/hello.html', (req,res) => {
+@app.get ('/hello.html')
+def index_(req,res):
     res.render ('hello')
-})
 
-app.get ('/world.html', (req,res) => {
+@app.get ('/world.html')
+def index_(req,res):
     res.render ('world')
-})
+
 
 #-----------------------------------------------------------------------
 # Launch the server
@@ -456,37 +443,37 @@ app.get ('/world.html', (req,res) => {
 # beginning of this file gives the URLs needed to launch any version.
 
 # if run env is Local, arg is the BUILD_DIR to use
-export function StartServer (command) {
-    stdout.write ('StartServer')
-    let ok = true
-    if (S16_RUN_ENV === 'Heroku') {
-        stdout.write ('Running on Internet server')
+def StartServer (command):
+    print('StartServer')
+    ok = True
+    if (S16_RUN_ENV == 'Heroku'):
+        print('Running on Internet server')
         # Find the directory this program is running in and use that to
         # find the build directory
-        S16_BUILD_DIR = path.join (S16_SERVER_DIR, '..', '..',
-                                   'Sigma16', 'build')
-    } else if (S16_RUN_ENV === 'Local') {
-        stdout.write ('Running on local development machine')
-        S16_LOCAL_BUILD_DIR = process.environ.S16_LOCAL_BUILD_DIR
-        S16_BUILD_DIR = f"{SIGSERVER_REPOSITORY}/Sigma16/build" if command === "version" else S16_LOCAL_BUILD_DIR
-        stdout.write (f"S16_LOCAL_BUILD_DIR = {S16_LOCAL_BUILD_DIR}")
-        stdout.write (f"S16_BUILD_DIR = {S16_BUILD_DIR}")
-    } else {
-        stdout.write (f"Server error: cannot find build directory for {S16_RUN_ENV}")
+        S16_BUILD_DIR = path.join (S16_SERVER_DIR, '..', '..', 'Sigma16', 'build')
+        
+    elif (S16_RUN_ENV == 'Local'):
+        print('Running on local development machine')
+        S16_LOCAL_BUILD_DIR = process.environ.get("S16_LOCAL_BUILD_DIR",None)
+        S16_BUILD_DIR = f"{SIGSERVER_REPOSITORY}/Sigma16/build" if command == "version" else S16_LOCAL_BUILD_DIR
+        print(f"S16_LOCAL_BUILD_DIR = {S16_LOCAL_BUILD_DIR}")
+        print(f"S16_BUILD_DIR = {S16_BUILD_DIR}")
+
+    else:
+        print(f"Server error: cannot find build directory for {S16_RUN_ENV}")
         ok = False
-    }
-    if (ok) {
-        stdout.write("Starting Sigma16 server")
-        stdout.write(f"command = {command}")
-        stdout.write(f"S16_RUN_ENV = {S16_RUN_ENV}")
-        stdout.write(f"S16_LATEST_RELEASE = {S16_LATEST_RELEASE}")
-        stdout.write(f"S16_RELEASE_VERSION = {S16_RELEASE_VERSION}")
-        stdout.write(f"S16_DEV_VERSION = {S16_DEV_VERSION}")
-        stdout.write(f"S16_SERVER_DIR = {S16_SERVER_DIR}")
-        stdout.write(f"S16_BUILD_DIR = {S16_BUILD_DIR}")
-        app.listen(PORT, lambda : stdout.write(f"Server is listening on port {PORT}"))
-    }
-}
+
+    if (ok):
+        print("Starting Sigma16 server")
+        print(f"command = {command}")
+        print(f"S16_RUN_ENV = {S16_RUN_ENV}")
+        print(f"S16_LATEST_RELEASE = {S16_LATEST_RELEASE}")
+        print(f"S16_RELEASE_VERSION = {S16_RELEASE_VERSION}")
+        print(f"S16_DEV_VERSION = {S16_DEV_VERSION}")
+        print(f"S16_SERVER_DIR = {S16_SERVER_DIR}")
+        print(f"S16_BUILD_DIR = {S16_BUILD_DIR}")
+        app.serve_forever()#PORT, lambda : print(f"Server is listening on port {PORT}"))
+
 
 # deprecated
 #        S16_BUILD_DIR = S16_LOCAL_BUILD_DIR
@@ -494,4 +481,4 @@ export function StartServer (command) {
 #                                   process.env.SIGPART2,
 #                                   process.env.SIGPART3,
 #                                   'Sigma16', 'build')
-#        stdout.write (`Local build directory = ${S16_LOCAL_BUILD_DIR}`)
+#        print (`Local build directory = ${S16_LOCAL_BUILD_DIR}`)

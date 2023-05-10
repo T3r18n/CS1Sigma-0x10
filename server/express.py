@@ -171,14 +171,25 @@ class HTTPREQHandler(httpserver.SimpleHTTPRequestHandler):
     
     def ext(self):
         pass
+class mime:
+    rules = {}
+    def define(self,rule):
+        mimetype = [i for i in rule][0]
+        ftypes = ""
+        mime.rules.setdefault(mimetype,ftypes)
+
+class static_:
+    mime = mime()
+    
 
 class HTTTPMixer(RefinedHTTPServer,HTTPREQHandler):
 
     config={}
+    static = static_()
     
-    def __init__(self, server_address: '_AfInetAddress', bind_and_activate: bool = True) -> None:
+    def __init__(self, server_address: '_AfInetAddress'=("127.0.0.1",8080), bind_and_activate: bool = True) -> None:
         self.handle_reqs = self.handlereq
-        self.config=self.__str__(),{"parent":self.config}
+        self.config={"parent":self.config}
         self.actions = ActionSet()
         super().__init__(server_address, self, bind_and_activate)
     
@@ -202,17 +213,29 @@ class HTTTPMixer(RefinedHTTPServer,HTTPREQHandler):
     def getAction(self,method,action):
         self.actions.get(method,action)
 
-    def get(self,action,callback):
-        self.setaction("get",action,callback)
+    def get(self,action):
+        print(action)
+        #self.setaction("get",action,callback)
+        return 
 
-    def set(self,key,value,global_=False,ancestory_=None):
+    def set(self,key,value,global_=False,ancestory_:int=None):
         config = self.config
+        conf = config
         if(global_):
-            while self.config.get("parent")
-        self.config.setdefault(key,value)
+            while (conf:=config.get("parent",None))!=None:
+                config=conf
+        elif(ancestory_!=None):
+            while ancestory_>=1:
+                config = config.get("parent",config)
+                ancestory_-=1
+        try:
+            config.setdefault(key,value)
+        except TypeError as type_error:
+            print("No such ancestor exists!")
+        return 
     
         
 
-server = HTTTPMixer(("127.0.0.1",8080))
+#server = HTTTPMixer(("127.0.0.1",8080))
 
-server.serve_forever()
+#server.serve_forever()

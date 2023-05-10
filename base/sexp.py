@@ -1,32 +1,32 @@
-// Sigma16: sexp.mjs
-// Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
-// See Sigma16/README, LICENSE, and https://jtod.github.io/home/Sigma16
+# Sigma16: sexp.mjs
+# Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
+# See Sigma16/README, LICENSE, and https:#jtod.github.io/home/Sigma16
 
-// This file is part of Sigma16.  Sigma16 is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-// Sigma16 is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// General Public License for more details.  You should have received
-// a copy of the GNU General Public License along with Sigma16.  If
-// not, see <https://www.gnu.org/licenses/>.
+# This file is part of Sigma16.  Sigma16 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+# Sigma16 is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.  You should have received
+# a copy of the GNU General Public License along with Sigma16.  If
+# not, see <https:#www.gnu.org/licenses/>.
 
-//------------------------------------------------------------------------
-// S-expressions
-//------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# S-expressions
+#------------------------------------------------------------------------
 
 import * as com from './common.mjs';
 import * as arith from './arithmetic.mjs';
 
-//----------------------------------------------------------------------
-// Primitive data structures
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Primitive data structures
+#----------------------------------------------------------------------
 
-// An s-expression is either an Atom or a Cons cell.  It has a tag
-// that indicates wiether it is a Cons, or its data type if it is an
-// atom.
+# An s-expression is either an Atom or a Cons cell.  It has a tag
+# that indicates wiether it is a Cons, or its data type if it is an
+# atom.
 
 const TagCons   = Symbol ('Cons')
 const TagNil    = Symbol ('Nil')
@@ -56,44 +56,44 @@ class Cons {
     }
 }
 
-//----------------------------------------------------------------------
-// The heap
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# The heap
+#----------------------------------------------------------------------
 
-// The Cons constructor uses the JavaScript virtual machine to
-// allocate a cell.  Currently the cons function uses that, and the
-// program relies on the JavaScript virtual machine's garbage
-// collector.  An alternative to consider is to initialzie the system
-// by building an explicit avail list, and to use its own garbage
-// collector.  That would be more complex, and might be slower (or
-// conceivable faster), but it would make it easier to limit the
-// amount of memory allocation and could give more graceful failure if
-// a program allocates too much.  This is a point to examine in more
-// depth later.
+# The Cons constructor uses the JavaScript virtual machine to
+# allocate a cell.  Currently the cons function uses that, and the
+# program relies on the JavaScript virtual machine's garbage
+# collector.  An alternative to consider is to initialzie the system
+# by building an explicit avail list, and to use its own garbage
+# collector.  That would be more complex, and might be slower (or
+# conceivable faster), but it would make it easier to limit the
+# amount of memory allocation and could give more graceful failure if
+# a program allocates too much.  This is a point to examine in more
+# depth later.
 
-//----------------------------------------------------------------------
-// Primitive functions
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Primitive functions
+#----------------------------------------------------------------------
 
-// The program normally doesn't use the class constructors directly;
-// instead it uses primitive functions that manipluate s-expressions. 
-// Functions to create an atom and cons cell.  Atom strings are not
-// currently interned; consider that for later.  Currently, each atom
-// has a separate copy of its string.
+# The program normally doesn't use the class constructors directly;
+# instead it uses primitive functions that manipluate s-expressions. 
+# Functions to create an atom and cons cell.  Atom strings are not
+# currently interned; consider that for later.  Currently, each atom
+# has a separate copy of its string.
 
-// Make atoms
+# Make atoms
 function mkInt16 (x) { return new Atom (TagInt16, x) }
 function mkBool (x)  { return new Atom (TagBool, x) }
 function mkSymbol (x) { return new Atom (TagSymbol, x) }
 function mkString (x) { return new Atom (TagString, x) }
 function cons (x,y) { return new Cons (x,y) }
 
-// Global constant atoms
+# Global constant atoms
 let nil = mkSymbol ('nil')
 let err = mkSymbol ('Error')
 let eof = mkSymbol ('EOF')
 
-// Check type of atom
+# Check type of atom
 function isAtom (x) { return x.tag !== TagCons }
 function isInt16 (x) { return x.tag == TagInt16 }
 
@@ -115,14 +115,14 @@ function testAtom () {
 
 function nullp (x) { return x === nil }
 
-// Global names for basic atoms.
+# Global names for basic atoms.
 
 
-// Since atoms are not interned, eq needs to compare the strings.
+# Since atoms are not interned, eq needs to compare the strings.
 
-function eq (x,y) {   // ???????????????????
+function eq (x,y) {   # ???????????????????
     return (x == y)
-//        || (x.atomic && y.atomic && x.atomstring == y.atomstring)
+#        || (x.atomic && y.atomic && x.atomstring == y.atomstring)
 }
 
 function car (x) {
@@ -163,9 +163,9 @@ function rplacd (x,y) {
     }
 }
 
-//----------------------------------------------------------------------
-// lexer
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# lexer
+#----------------------------------------------------------------------
 
 function getToken () {
     if (inputTokens.length == 0) {
@@ -183,7 +183,7 @@ function lookToken () {
     }
 }
 
-// Determine what kind of atom a token represents
+# Determine what kind of atom a token represents
 function isSymbol (tok) {
     let a = tok[0]
     return a != '(' && a != ')' && a != '.'
@@ -215,16 +215,16 @@ function testGetToken () {
       ")",
       ".",
       "end" ]
-    console.log (lookToken())  // abc
-    console.log (lookToken())  // abc
-    console.log (getToken())   // abc
-    console.log (lookToken())  // pqr  
-    console.log (getToken())   // pqr
-    console.log (getToken())   // 2345
-    console.log (getToken())   // "this is a string"
-    console.log (getToken())   // (
-    console.log (getToken())   // )
-    console.log (getToken())   // .
+    console.log (lookToken())  # abc
+    console.log (lookToken())  # abc
+    console.log (getToken())   # abc
+    console.log (lookToken())  # pqr  
+    console.log (getToken())   # pqr
+    console.log (getToken())   # 2345
+    console.log (getToken())   # "this is a string"
+    console.log (getToken())   # (
+    console.log (getToken())   # )
+    console.log (getToken())   # .
 
     console.log (isSymbol ('abc'))
     console.log (isSymbol ('('))
@@ -236,9 +236,9 @@ function testGetToken () {
     console.log ('testGetToken end\n')
 }
 
-//----------------------------------------------------------------------
-// parser
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# parser
+#----------------------------------------------------------------------
 
 
 function error(msg) {
@@ -249,21 +249,21 @@ function error(msg) {
 function readsexp () {
     let t = getToken ()
     let result = nil
-//    console.log (`readsexp: t = ${t}`)
-//    if (isSymbol(t)) {
-//        result = symbol(t)
-//    }
+#    console.log (`readsexp: t = ${t}`)
+#    if (isSymbol(t)) {
+#        result = symbol(t)
+#    }
     if (t == "true" || t == "false") {
         result = mkBool(t)
     } else if (t == "(") {
-//        console.log ("readsexp: handling left paren")
+#        console.log ("readsexp: handling left paren")
         let head = cons (nil,nil)
         let last = head
         let x = nil
         let newCell = nil
         while (lookToken() != ")") {
             x = readsexp()
-//            console.log (`readsexp: x=${x.show()}`)
+#            console.log (`readsexp: x=${x.show()}`)
             newCell = cons (x,nil)
             rplacd (last,newCell)
             last = newCell
@@ -280,9 +280,9 @@ function readsexp () {
         error ("readsexp: unexpected dot")
     } else {
         result = mkSymbol(t)
-//        error ("readsexp: unexpected token ${t}")
+#        error ("readsexp: unexpected token ${t}")
     }
-//    console.log (`reasexp: returning ${result.show()}`)
+#    console.log (`reasexp: returning ${result.show()}`)
     return result
 }
 
@@ -306,16 +306,16 @@ function printSexp (x) {
     return str
 }
 
-//----------------------------------------------------------------------
-// Examples and unit testing
-//----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Examples and unit testing
+#----------------------------------------------------------------------
 
 function unitTest () {
     console.log ("\nunitTest start")
 
     testGetToken()
     
-    // atoms
+    # atoms
     let x = new Atom("abc")
     let y = new Atom ("def")
     console.log (x.show())
@@ -323,7 +323,7 @@ function unitTest () {
     console.log (eq (x,x))
     console.log (eq (x,y))
 
-    // z and w are equal but not eq
+    # z and w are equal but not eq
     let z = new Cons (x,y)
     let w = new Cons (x,y)
     console.log (z.show())
@@ -331,7 +331,7 @@ function unitTest () {
     console.log (eq (z,z))
     console.log (eq (z,w))
 
-    // ztwo is eq to z
+    # ztwo is eq to z
     let ztwo = z
     console.log ('ztwo is eq to z')
     console.log (ztwo.show())
@@ -339,17 +339,17 @@ function unitTest () {
     console.log (w.show())
     console.log (eq(ztwo,w))
     
-    // but ztwo is not eq to w
+    # but ztwo is not eq to w
     console.log ('ztwo is not eq to w')
     console.log (ztwo.show())
     console.log (z.show())
     console.log (eq(ztwo,z))
 
-    // dotted pair
+    # dotted pair
     let dp = cons (mkSymbol('a1'), mkSymbol('a2'))
     console.log (dp.show())
 
-    // list of atoms
+    # list of atoms
     let lat = cons (mkSymbol ('a'),
                     cons (mkSymbol('b'),
                           cons (mkSymbol('c'), nil)))
@@ -396,7 +396,7 @@ function testRead () {
     console.log ('testRead end\n')
 }
 
-// Main program: Run test cases
+# Main program: Run test cases
 
 let inputTokens = []
 
@@ -416,8 +416,8 @@ inputTokens =
       "end" ]
 
 
-// testGetToken ()
+# testGetToken ()
 testAtom ()
-// testPrim()
-// unitTest()
+# testPrim()
+# unitTest()
 testRead()

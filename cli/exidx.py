@@ -1,38 +1,38 @@
-// Sigma16: exidx.mjs
-// Build html index of directory of asm.txt examples
+# Sigma16: exidx.mjs
+# Build html index of directory of asm.txt examples
 
-// Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
-// See Sigma16/README, LICENSE, and https://jtod.github.io/home/Sigma16
+# Copyright (C) 2023 John T. O'Donnell.  License: GNU GPL Version 3 or later
+# See Sigma16/README, LICENSE, and https:#jtod.github.io/home/Sigma16
 
-// This file is part of Sigma16.  Sigma16 is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-// Sigma16 is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// General Public License for more details.  You should have received
-// a copy of the GNU General Public License along with Sigma16.  If
-// not, see <https://www.gnu.org/licenses/>.
+# This file is part of Sigma16.  Sigma16 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+# Sigma16 is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.  You should have received
+# a copy of the GNU General Public License along with Sigma16.  If
+# not, see <https:#www.gnu.org/licenses/>.
 
-// Usage: must run in Sigma16 source directory. node .../exidx.mjs
-// builds index.html in examples directory and all its subdirectories.
-// It assumes every source file ends in .asm.txt, and it uses the
-// first two lines of text to find the text to display in the index.
+# Usage: must run in Sigma16 source directory. node .../exidx.mjs
+# builds index.html in examples directory and all its subdirectories.
+# It assumes every source file ends in .asm.txt, and it uses the
+# first two lines of text to find the text to display in the index.
 
 import * as fs from 'fs';
 
-// Parsing
-const asmSrcFile = /\.asm\.txt$/      // find asm source files
-const exampleDir = /(Examples\S*)/   // find last part of directory path
-const exampleName = /[^\:]*\:(.*)/   // find comment after : in first line
-const leadingsemi = /\;(.*)/         // find leading semicolon in second line
+# Parsing
+const asmSrcFile = /\.asm\.txt$/      # find asm source files
+const exampleDir = /(Examples\S*)/   # find last part of directory path
+const exampleName = /[^\:]*\:(.*)/   # find comment after : in first line
+const leadingsemi = /\;(.*)/         # find leading semicolon in second line
 
-// Global count variables
+# Global count variables
 let nSourceFiles = 0
 let nDirectories = 0
 
-// Header of the generated html
+# Header of the generated html
 function initHtml (title) {
     let initHtmlIdx = "<html>\n"
     initHtmlIdx += "<head>\n"
@@ -52,7 +52,7 @@ function initHtml (title) {
     return initHtmlIdx
 }
 
-// Utility function: display info about a file path
+# Utility function: display info about a file path
 function showFileStats (path, statsObj) {
     const description = statsObj.isFile() ? 'file'
           : statsObj.isDirectory() ? 'dir'
@@ -60,14 +60,14 @@ function showFileStats (path, statsObj) {
     console.log (`showFileStats: path ${path} is ${description}`)
 }
 
-// Indentation of depth d
+# Indentation of depth d
 function depth (d) {
     return '   '.repeat(d)
 }
 
-// This is the top level function; the main program calls it, and when
-// a subdirectory is encountered handleDir is called recursively.
-// d = depth, topdir = .../Sigma16, f = path from Sigma16 to current
+# This is the top level function; the main program calls it, and when
+# a subdirectory is encountered handleDir is called recursively.
+# d = depth, topdir = .../Sigma16, f = path from Sigma16 to current
 
 function handleDir (d, topdir, parents, f) {
     nDirectories++
@@ -75,7 +75,7 @@ function handleDir (d, topdir, parents, f) {
     let extparents = `${parents}/${f}`
     console.log (`${depth(d)}Directory ${parents}/${f}`)
     let title = f
-    title = title.replace(/\\/g, '/')     // replace \ by / in path
+    title = title.replace(/\\/g, '/')     # replace \ by / in path
     let html = initHtml (title)
     if (d > 0) {
         html += `<li> <a href=\"../index.html">Up to ${parents}</a> </li>\n`
@@ -83,7 +83,7 @@ function handleDir (d, topdir, parents, f) {
     let newHtml = `<li>`
         + ` <a href=\"./${title}/index.html\">${title}</a>`
         + `</li>\n`
-    const flist = fs.readdirSync(path)     // all the files in directory
+    const flist = fs.readdirSync(path)     # all the files in directory
     let fileCount = 0
     let subdirCount = 0
     for (let h of flist) {
@@ -100,7 +100,7 @@ function handleDir (d, topdir, parents, f) {
         }
     }
 
-    // Print summary and finish html
+    # Print summary and finish html
     console.log (`${depth(d+1)}Directory ${f}:`
                  + ` found ${fileCount} source files`
                  + ` and ${subdirCount} subdirectories`)
@@ -114,8 +114,8 @@ function handleDir (d, topdir, parents, f) {
 function handleFile (d, topdir, parents, f) {
     let html = ''
     let path = `${topdir}${parents}/${f}`
-//    console.log (`${depth(d)}handleFile par=${parents} f=${f}`)
-    if (path.search(asmSrcFile) > -1) { // consider only *.asm.txt
+#    console.log (`${depth(d)}handleFile par=${parents} f=${f}`)
+    if (path.search(asmSrcFile) > -1) { # consider only *.asm.txt
         nSourceFiles++
         console.log (`${depth(d)}Source file ${f}`)
         let text = fs.readFileSync (path)
@@ -135,10 +135,10 @@ function handleFile (d, topdir, parents, f) {
     return html
 }
 
-// Main program: exidx should be launched from the Sigma16 source
-// directory, and it starts with the Examples directory
+# Main program: exidx should be launched from the Sigma16 source
+# directory, and it starts with the Examples directory
 
-const sigdir = process.cwd ()            // current directory
+const sigdir = process.cwd ()            # current directory
 console.log (`exidx starting in ${sigdir}`)
 handleDir (0,  sigdir, '', 'Examples')
 console.log (`Found ${nDirectories} directories`
