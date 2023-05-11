@@ -17,16 +17,16 @@
 
 // The following sizes and offsets are measured in words
 
-export const EmCtlSize        = 16
-export const EmRegFileSize    = 16
-export const EmSysRegSize     = 16
-export const EmRegBlockSize   = EmRegFileSize + EmSysRegSize
-export const EmMemSize        = 65536
-export const EmStateSizeWord  = EmCtlSize + EmRegBlockSize + EmMemSize
+export const EmCtlSize = 16
+export const EmRegFileSize = 16
+export const EmSysRegSize = 16
+export const EmRegBlockSize = EmRegFileSize + EmSysRegSize
+export const EmMemSize = 65536
+export const EmStateSizeWord = EmCtlSize + EmRegBlockSize + EmMemSize
 
 export const EmRegBlockOffset = EmCtlSize
-export const EmMemOffset      = EmRegBlockOffset + EmRegBlockSize
+export const EmMemOffset = EmRegBlockOffset + EmRegBlockSize
 
 // The following sizes and offsets are measured in bytes
 
-export const EmStateSizeByte  = 2 * EmStateSizeWord
+export const EmStateSizeByte = 2 * EmStateSizeWord

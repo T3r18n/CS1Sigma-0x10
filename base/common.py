@@ -69,7 +69,7 @@ class mode :
     def devlog (xs):
         if (mode.trace):
             sys.stdout.write (f"{xs}")
-    
+
     def errlog (xs):
         if (mode.showErr):
             sys.stdout.write (f"{xs}")
@@ -87,43 +87,38 @@ def indicateError (xs):
 # Dialogues with the user
 #----------------------------------------------------------------------
 
-export function modalWarning (msg) {
-    alert (msg);
-}
+def modalWarning (msg):
+    alert (msg)
 
 # The innerHTML
 # string is <pre ...>text of example</pre>.  The pre and pre tags
 # need to be removed: they would confuse the assembler.
 
-export const openingPreTag = /^<[^>]*>/;   # <pre...> at beginning
-export const closingPreTag = /<[^>]*>$/;   # ...</pre> at end
+openingPreTag = "/^<[^>]*>/"   # <pre...> at beginning
+closingPreTag = "/<[^>]*>$/"   # ...</pre> at end
 
 # Clear the display of the object code in the linker pane
 
-export function clearObjectCode () {
-    let listing = "<pre class='HighlightedTextAsHtml'>"
-        + "</pre>"
+def clearObjectCode ():
+    listing = "<pre class='HighlightedTextAsHtml'>" + "</pre>"
 #    document.getElementById('LinkerText').innerHTML = listing;
-    document.getElementById('LP_Body').innerHTML = listing;
+    document.getElementById('LP_Body').innerHTML = listing
 #    console.log ("clearObjectCode skipping clear LinkerText");
-}
 
 # Similar to highlightListingLine in emulator
 
-export function highlightField (xs,highlight) {
-    return "<span class='" + highlight + "'>" + xs + "</span>";
-}
+def highlightField (xs,highlight):
+    return "<span class='" + highlight + "'>" + xs + "</span>"
 
 
 # scrolling doesn't work if it just uses <pre> but not <code>
 
-export let editorBufferTextArea; #
-export let textFile = null; #
-export let create;  #
-export let textbox; #
+editorBufferTextArea = None #
+textFile = None #
+create = None  #
+textbox = None #
 
 # Text
 
-export function highlightText (txt,tag) {
-    return "<span class='" + tag + "'>" + txt + "</span>";
-}
+def highlightText (txt,tag):
+    return "<span class='" + tag + "'>" + txt + "</span>"

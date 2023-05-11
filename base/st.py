@@ -1,3 +1,7 @@
+import common  as com
+import architecture as arch
+import arrbuf as ab
+
 #-------------------------------------------------------------------------
 # Stages
 #-------------------------------------------------------------------------
@@ -10,17 +14,17 @@ StageExe = Symbol ("Exe")   #.xmd.    metadata for exe
 StageXmd = Symbol ("Xmd")   #.xmd.    metadata for exe
 
 def getStageSym (xs) :
-    if(xs == "asm"): 
+    if(xs == "asm"):
         return StageAsm
-    if(xs == "obj"): 
+    if(xs == "obj"):
         return StageObj
-    if(xs == "omd"): 
+    if(xs == "omd"):
         return StageOmd
-    if(xs == "lnk"): 
+    if(xs == "lnk"):
         return StageLnk
-    if(xs == "exe"): 
+    if(xs == "exe"):
         return StageExe
-    if(xs == "xmd"): 
+    if(xs == "xmd"):
         return StageXmd
     return None
 
@@ -38,12 +42,12 @@ class SystemState :
         this.anonymousCount = 0
         this.emulatorState = None
         this.linkerState = None
-    
+
     def showSelectedModuleName (this):
         if(this.selectedModule):
             return this.selectedModule
         return "No module selected"
-    
+
     def clearModules (this) :
         this.modules = {}
         this.anonymousCount = 0

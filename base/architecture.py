@@ -18,8 +18,8 @@
 # formats, opcodes, mnemonics, and flag bits
 # ---------------------------------------------------------------------
 
-import * as com from './common.mjs';
-import * as smod from './s16module.mjs';
+import common as com
+import s16module as smod
 
 #----------------------------------------------------------------------
 # Bit indexing
@@ -45,51 +45,51 @@ import * as smod from './s16module.mjs';
 
 # Get bit i from k-bit word w
 
-export function getBitInWordLE (w,i)   { return (w >>> i)     & 0x0001 }
-export function getBitInWordBE (k,w,i) { return (w >>> (k-i)) & 0x0001 }
+def getBitInWordLE (w,i):
+   return (w >> i)&0x0001
+
+def getBitInWordBE (k,w,i):
+   return (w >> (k-i)) & 0x0001
 
 # Put bit b into word x of size k in bit position i
 
-export function putBitInWordLE (k,x,i,b) {
-    return b==0 ? x & maskToClearBitLE(i)   : x | maskToSetBitLE(i)
-}
-export function putBitInWordBE (k,x,i,b) {
-    return b==0 ? x & maskToClearBitBE(k,i) : x | maskToSetBitBE(k,i)
-}
+def putBitInWordLE (k,x,i,b):
+    return x & maskToClearBitLE(i) if b==0 else x | maskToSetBitLE(i)
+
+def putBitInWordBE (k,x,i,b):
+    return x & maskToClearBitBE(k,i) if b==0 else x | maskToSetBitBE(k,i)
 
 # Generate mask to clear/set bit i in a k-bit word
 
-export function maskToClearBitLE (i)   { return ~(1<<i)      & 0xffff }
-export function maskToSetBitLE   (i)   { return (1 << i)     & 0xffff }
-export function maskToClearBitBE (k,i) { return ~(1<<(k-i))  & 0xffff }
-export function maskToSetBitBE   (k,i) { return (1 << (k-i)) & 0xffff }
+def maskToClearBitLE (i): return ~(1<<i )& 0xffff
+def maskToSetBitLE   (i): return (1 << i) & 0xffff
+def maskToClearBitBE (k,i): return ~(1<<(k-i)) & 0xffff
+def maskToSetBitBE   (k,i): return (1 << (k-i)) & 0xffff
 
 # Access bit i in register r with k-bit words
 
-export function getBitInRegLE (r,i) {
-    return (r.get() >>> i) & 0x0001
-}
-export function clearBitInRegLE (r,i) {
+def getBitInRegLE (r,i):
+    return (r.get() >> i) & 0x0001
+
+def clearBitInRegLE (r,i):
     r.put (r.get() & maskToClearBitLE(i))
-}
-export function setBitInRegLE (r,i) {
+
+def setBitInRegLE (r,i):
     r.put (r.get() | maskToSetBitLE(i))
-}
-export function getBitInRegBE (k,r,i) {
-    return (r.get() >>> (k-i)) & 0x0001
-}
-export function clearBitInRegBE (k,r,i) {
+
+def getBitInRegBE (k,r,i):
+    return (r.get() >> (k-i)) & 0x0001
+
+def clearBitInRegBE (k,r,i):
     r.put (r.get() & maskToClearBitBE(k,i))
-}
-export function setBitInRegBE (k,r,i) {
+
+def setBitInRegBE (k,r,i):
     r.put (r.get() | maskToSetBitBE(k,i))
-}
 
 # Return Boolean from bit i in word x
 
-export function extractBoolLE (x,i) {
-    return getBitInWordLE (x,i) === 1
-}
+def extractBoolLE (x,i):
+    return getBitInWordLE (x,i) == 1
 
 #----------------------------------------------------------------------
 # Architecture constants
@@ -97,27 +97,24 @@ export function extractBoolLE (x,i) {
 
 # Should make memSize adjustable in settings, with default = 65536
 
-export const memSize = 65536; # number of memory locations = 2^16
+memSize = 65536; # number of memory locations = 2^16
 
 # Sigma16 has a standard 16-bit architecture S16, and an extended
 # architecture S32 that has 32-bit registers and addresses
 
-export const S16 = Symbol ('S16')
-export const S32 = Symbol ('S32')
+S16 = Symbol ('S16')
+S32 = Symbol ('S32')
 
 # Instruction formats
 
-export const iRRR   = Symbol ("RRR");
-export const iRX    = Symbol ("RX");
-export const iEXP   = Symbol ("EXP");
+iRRR   = Symbol ("RRR");
+iRX    = Symbol ("RX");
+iEXP   = Symbol ("EXP");
 
 # Return the size of an instruction given its format
 
-export function formatSize (ifmt) {
-    return ifmt==iRRR  ? 1
-        : (ifmt==iRX || ifmt==iEXP) ? 2
-        : 0
-}
+def formatSize (ifmt):
+    return 1 if(ifmt==iRRR) else ( 2 if(ifmt==iRX or ifmt==iEXP) else 0)
 
 #----------------------------------------------------------------------
 # Assembly language statement formats
@@ -129,39 +126,39 @@ export function formatSize (ifmt) {
 # statement formats allow "don't care" fields to be omitted, and
 # fields to be used for either register numbers or constants.
 
-export const iData    = Symbol ("data")
-export const iDir     = Symbol ("iDir")
-export const iEmpty   = Symbol ("iEmpty")
+iData    = Symbol ("data")
+iDir     = Symbol ("iDir")
+iEmpty   = Symbol ("iEmpty")
 
 # Assembly language statement operand formats
-export const a0       = Symbol ("");         # resume
-export const aRR      = Symbol ("RR");       # cmp      R1,R2
-export const aRRR     = Symbol ("RRR");      # add      R1,R2,R3
-export const aRC      = Symbol ("RC");       # putctl   R1,status
-export const aK    = Symbol ("K");     # brf      loop
-export const aX       = Symbol ("X");        # jump     loop[R0]
-export const aRX      = Symbol ("RX");       # load     R1,xyz[R2]
-export const aRRX     = Symbol ("RRX");      # save     R4,R7,5[R13]
-export const aRK   = Symbol ("RK");       # brfnz    R1,xyz
-export const akX      = Symbol ("kX");       # jumpc0   3,next[R0]
-export const aRRk     = Symbol ("RRk");      # invb     R1,R2,7
-export const aRkk     = Symbol ("Rkk"); # field R1,3,12  ?? should be RRkk
-export const aRkK  = Symbol ("RkK");      # brfc0  R2,4,230
-export const aRkkkk   = Symbol ("Rkkkk");    # logicb   R1,3,8,2,xor
-export const aRkRkk   = Symbol ("RkRkk");    # logicbcc R5,4,R9,3,and
-export const aRkkk    = Symbol ("Rkkk");     # xorb     R1,3,8,2
-export const aRRRk    = Symbol ("RRRk");     # logicw   R1,R2,R3,xor
-export const aRkkRk   = Symbol ("RkkRk");    # extract  R1,7,4,R2,12
-export const aRRRkk   = Symbol ("RRRkk");    # inject   R1,R2,R3,5,7
-export const aData    = Symbol ("data");     # data     34
-export const aModule  = Symbol ("module");   # module
-export const aImport  = Symbol ("import");   # import   Mod1,x
-export const aExport  = Symbol ("export");   # export   fcn
-export const aOrg     = Symbol ("org");      # org      arr+5
-export const aEqu     = Symbol ("equ");      # equ      rcd+4
-export const aBlock   = Symbol ("block");    # block    100
+a0       = Symbol ("");         # resume
+aRR      = Symbol ("RR");       # cmp      R1,R2
+aRRR     = Symbol ("RRR");      # add      R1,R2,R3
+aRC      = Symbol ("RC");       # putctl   R1,status
+aK    = Symbol ("K");     # brf      loop
+aX       = Symbol ("X");        # jump     loop[R0]
+aRX      = Symbol ("RX");       # load     R1,xyz[R2]
+aRRX     = Symbol ("RRX");      # save     R4,R7,5[R13]
+aRK   = Symbol ("RK");       # brfnz    R1,xyz
+akX      = Symbol ("kX");       # jumpc0   3,next[R0]
+aRRk     = Symbol ("RRk");      # invb     R1,R2,7
+aRkk     = Symbol ("Rkk"); # field R1,3,12  ?? should be RRkk
+aRkK  = Symbol ("RkK");      # brfc0  R2,4,230
+aRkkkk   = Symbol ("Rkkkk");    # logicb   R1,3,8,2,xor
+aRkRkk   = Symbol ("RkRkk");    # logicbcc R5,4,R9,3,and
+aRkkk    = Symbol ("Rkkk");     # xorb     R1,3,8,2
+aRRRk    = Symbol ("RRRk");     # logicw   R1,R2,R3,xor
+aRkkRk   = Symbol ("RkkRk");    # extract  R1,7,4,R2,12
+aRRRkk   = Symbol ("RRRkk");    # inject   R1,R2,R3,5,7
+aData    = Symbol ("data");     # data     34
+aModule  = Symbol ("module");   # module
+aImport  = Symbol ("import");   # import   Mod1,x
+aExport  = Symbol ("export");   # export   fcn
+aOrg     = Symbol ("org");      # org      arr+5
+aEqu     = Symbol ("equ");      # equ      rcd+4
+aBlock   = Symbol ("block");    # block    100
 
-# export const aRRkkk   = Symbol ("RRk");      # extract  Rd,Rs,di,si,size
+# aRRkkk   = Symbol ("RRk");      # extract  Rd,Rs,di,si,size
 
 #----------------------------------------------------------------------
 # Instruction mnemonics
@@ -170,20 +167,17 @@ export const aBlock   = Symbol ("block");    # block    100
 # These arrays are indexed by an opcode to give the corresponding
 # mnemonic
 
-export const mnemonicRRR =
-  ["add",      "sub",      "mul",       "div",        # 0-3
+mnemonicRRR = ["add",      "sub",      "mul",       "div",        # 0-3
    "cmp",      "addc",     "muln",      "divn",       # 4-7
    "rrr1",     "rrr2",     "rrr3",      "rrr4",       # 8-11
    "trap",     "EXP3",     "EXP2",      "RX"]         # 12-15
 
-export const mnemonicRX =
-  ["lea",      "load",     "store",     "jump",       # 0-3
+mnemonicRX =  ["lea",      "load",     "store",     "jump",       # 0-3
    "jumpc0",   "jumpc1",   "jal",       "jumpz",      # 4-7
    "jumpnz",   "brc0",     "brc1",      "testset",    # 8-b
    "leal",     "loadl",    "storel",    "noprx"]      # c-f
 
-export const mnemonicEXP =
-    ["brf",     "brb",      "brfi",     "brfc0",   # 00-03
+mnemonicEXP = ["brf",     "brb",      "brfi",     "brfc0",   # 00-03
      "brbc0",   "brfc1",    "brbc1",    "brfz",    # 04-07
      "brbz",    "brfnz",    "brbnz",    "save",    # 08-0b
      "restore", "push",     "pop",      "top",     # 0c-0f
@@ -200,18 +194,18 @@ export const mnemonicEXP =
 # control registers (used in the assembly language) and the numeric
 # index for the control register (used in the machine language).
 
-export let ctlReg = new Map();
+ctlReg = dict();
 
-ctlReg.set ("status",   {ctlRegIndex:0});
-ctlReg.set ("mask",     {ctlRegIndex:1});
-ctlReg.set ("req",      {ctlRegIndex:2});
-ctlReg.set ("rstat",    {ctlRegIndex:3});
-ctlReg.set ("rpc",      {ctlRegIndex:4});
-ctlReg.set ("vect",     {ctlRegIndex:5});
-ctlReg.set ("psegBeg",  {ctlRegIndex:6});
-ctlReg.set ("psegEnd",  {ctlRegIndex:7});
-ctlReg.set ("dsegBeg",  {ctlRegIndex:8});
-ctlReg.set ("dsegEnd",  {ctlRegIndex:9});
+ctlReg.setdefault("status",   {"ctlRegIndex":0})
+ctlReg.setdefault("mask",     {"ctlRegIndex":1})
+ctlReg.setdefault("req",      {"ctlRegIndex":2})
+ctlReg.setdefault("rstat",    {"ctlRegIndex":3})
+ctlReg.setdefault("rpc",      {"ctlRegIndex":4})
+ctlReg.setdefault("vect",     {"ctlRegIndex":5})
+ctlReg.setdefault("psegBeg",  {"ctlRegIndex":6})
+ctlReg.setdefault("psegEnd",  {"ctlRegIndex":7})
+ctlReg.setdefault("dsegBeg",  {"ctlRegIndex":8})
+ctlReg.setdefault("dsegEnd",  {"ctlRegIndex":9})
 
 #----------------------------------------------------------------------
 # Condition code
@@ -249,51 +243,39 @@ ctlReg.set ("dsegEnd",  {ctlRegIndex:9});
 # bit 9  0200  s      s        bin carry out, carry in (addc)
 # bit 10 0400  f      f        logicc function result
 
-export const bit_ccg = 0   # 0001 > greater than integer (two's complement)
-export const bit_ccG = 1   # 0002 G greater than natural (binary)
-export const bit_ccE = 2   # 0004 = equal all types
-export const bit_ccL = 3   # 0008 L less than natural (binary)
+bit_ccg = 0   # 0001 > greater than integer (two's complement)
+bit_ccG = 1   # 0002 G greater than natural (binary)
+bit_ccE = 2   # 0004 = equal all types
+bit_ccL = 3   # 0008 L less than natural (binary)
 
-export const bit_ccl = 4   # 0010 < less than integer (two's complement)
-export const bit_ccv = 5   # 0020 v overflow integer (two's complement)
-export const bit_ccV = 6   # 0040 V overflow natural (binary)
-export const bit_ccC = 7   # 0080 C carry propagation natural (binary)
+bit_ccl = 4   # 0010 < less than integer (two's complement)
+bit_ccv = 5   # 0020 v overflow integer (two's complement)
+bit_ccV = 6   # 0040 V overflow natural (binary)
+bit_ccC = 7   # 0080 C carry propagation natural (binary)
 
-export const bit_ccS = 8   # 0100 S stack overflow
-export const bit_ccs = 9   # 0200 s stack underflow
-export const bit_ccf = 10  # 0400 f logicc instruction function result
+bit_ccS = 8   # 0100 S stack overflow
+bit_ccs = 9   # 0200 s stack underflow
+bit_ccf = 10  # 0400 f logicc instruction function result
 
 # Define a mask with 1 in specified bit position
-export const ccg = maskToSetBitLE (bit_ccg)
-export const ccG = maskToSetBitLE (bit_ccG)
-export const ccE = maskToSetBitLE (bit_ccE)
-export const ccL = maskToSetBitLE (bit_ccL)
-export const ccl = maskToSetBitLE (bit_ccl)
-export const ccv = maskToSetBitLE (bit_ccv)
-export const ccV = maskToSetBitLE (bit_ccV)
-export const ccC = maskToSetBitLE (bit_ccC)
-export const ccS = maskToSetBitLE (bit_ccS)
-export const ccs = maskToSetBitLE (bit_ccs)
-export const ccf = maskToSetBitLE (bit_ccf)
+ccg = maskToSetBitLE (bit_ccg)
+ccG = maskToSetBitLE (bit_ccG)
+ccE = maskToSetBitLE (bit_ccE)
+ccL = maskToSetBitLE (bit_ccL)
+ccl = maskToSetBitLE (bit_ccl)
+ccv = maskToSetBitLE (bit_ccv)
+ccV = maskToSetBitLE (bit_ccV)
+ccC = maskToSetBitLE (bit_ccC)
+ccS = maskToSetBitLE (bit_ccS)
+ccs = maskToSetBitLE (bit_ccs)
+ccf = maskToSetBitLE (bit_ccf)
 
 # Return a string giving symbolic representation of the condition
 # code; this is used in the instruction display
 
-export function showCC (c) {
-    com.mode.devlog (`showCC ${c}`);
-    return (extractBoolLE (c,bit_ccs) ? 's' : '')
-	+ (extractBoolLE (c,bit_ccS) ? 'S' : '')
-	+ (extractBoolLE (c,bit_ccC) ? 'C' : '')
-	+ (extractBoolLE (c,bit_ccV) ? 'V' : '')
-	+ (extractBoolLE (c,bit_ccv) ? 'v' : '')
-	+ (extractBoolLE (c,bit_ccl) ? '&lt;' : '')
-	+ (extractBoolLE (c,bit_ccL) ? 'L' : '')
-	+ (extractBoolLE (c,bit_ccE) ? '=' : '')
-	+ (extractBoolLE (c,bit_ccG) ? 'G' : '')
-	+ (extractBoolLE (c,bit_ccg) ? '>' : '')
-	+ (extractBoolLE (c,bit_ccf) ? 'f' : '')
-}
-
+def showCC (c):
+    com.mode.devlog (f"showCC {c}");
+    return ( 's' if extractBoolLE (c,bit_ccs) else '') + ( 's' if extractBoolLE (c,bit_ccS) else '') + (extractBoolLE (c,bit_ccC) ? 'C' : '') + (extractBoolLE (c,bit_ccV) ? 'V' : '') + (extractBoolLE (c,bit_ccv) ? 'v' : '') + (extractBoolLE (c,bit_ccl) ? '&lt;' : '') + (extractBoolLE (c,bit_ccL) ? 'L' : '') + (extractBoolLE (c,bit_ccE) ? '=' : '') + (extractBoolLE (c,bit_ccG) ? 'G' : '') + ( '>' if extractBoolLE (c,bit_ccg) else  '') + ('f' if extractBoolLE (c,bit_ccf) else  '')
 
 
 #----------------------------------------------------------------------
@@ -314,20 +296,20 @@ export function showCC (c) {
 # the machine boots, because interrupts are unsafe to execute until
 # the interrupt vector has been initialized.
 
-export const userStateBit     = 0;   # 0 = system state,  1 = user state
-export const intEnableBit     = 1;   # 0 = disabled,      1 = enabled
+userStateBit     = 0;   # 0 = system state,  1 = user state
+intEnableBit     = 1;   # 0 = disabled,      1 = enabled
 
 #----------------------------------------------------------------------
 # Interrupt request and mask bits
 #----------------------------------------------------------------------
 
-export const timerBit            = 0;   # timer has gone off
-export const segFaultBit         = 1;   # access invalid virtual address
-export const stackOverflowBit    = 2;   # invalid memory virtual address
-export const stackUnderflowBit   = 3;   # invalid memory virtual address
-export const userTrapBit         = 4;   # user trap
-export const overflowBit         = 5;   # overflow occurred
-export const zDivBit             = 6;   # division by 0
+timerBit            = 0;   # timer has gone off
+segFaultBit         = 1;   # access invalid virtual address
+stackOverflowBit    = 2;   # invalid memory virtual address
+stackUnderflowBit   = 3;   # invalid memory virtual address
+userTrapBit         = 4;   # user trap
+overflowBit         = 5;   # overflow occurred
+zDivBit             = 6;   # division by 0
 
 #----------------------------------------------------------------------
 # Assembly language data definitions for control bits
@@ -361,7 +343,7 @@ export const zDivBit             = 6;   # division by 0
 # the opcode, which isrepresented as a list of expanding opcodes.
 
 export let statementSpec = new Map()
-export const emptyOperation = {ifmt:iEmpty, afmt:a0, opcode:[]}
+emptyOperation = {ifmt:iEmpty, afmt:a0, opcode:[]}
 
 # Primary opcodes (in the op field) of 0-11 denote RRR instructions.
 
@@ -406,7 +388,7 @@ statementSpec.set("tstset", {ifmt:iRX,   afmt:aRX, opcode:[15,11]})
 # opcode ab is between 0 and 7.  (If 8 <= ab then the instruction is
 # EXP format.)  [Considering abandoning EXP1; no harm in wasting a
 # word by using EXP for the resume instruction.]
-   
+
 # EXP instructions are represented in 2 words, with primary opcode e
 # and an 8-bit secondary opcode in the ab field, where ab >= 8.  (If
 # 0 <= ab <8 then the instruction is EXP1 format.)
@@ -523,13 +505,13 @@ statementSpec.set("xorb",    {ifmt:iEXP, afmt:aRkkk, opcode:[14,8,6],
 statementSpec.set("field",   {ifmt:iEXP, afmt:aRkk,  opcode:[14,8],
                               pseudo:true});
 
-export const clearIntEnable = maskToClearBitBE (intEnableBit);
-export const setSystemState = maskToClearBitBE (userStateBit);
+clearIntEnable = maskToClearBitBE (intEnableBit);
+setSystemState = maskToClearBitBE (userStateBit);
 
 # deprecated or in progress...
 # execute, dispatch
-# export const mnemonicEXP3 = ["shiftll", "shiftrl"]
-# export const iEXP3  = Symbol ("EXP3");
+# mnemonicEXP3 = ["shiftll", "shiftrl"]
+# iEXP3  = Symbol ("EXP3");
 #        : ifmt==iEXP3 ? 3
 # EXP3 instructions are represented in 3 words, with primary opcode d
 # and an 8-bit secondary opcode in the ab field.
